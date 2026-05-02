@@ -84,15 +84,64 @@ void parse(char *p, stack *s) {
 			if (strcmp(token, "*") == 0) {
 				obj *a = pop(s);
 				obj *b = pop(s);
-			//	printf("%d\t%d\n", a->type.i, b->type.i);
 				int r = a->type.i * b->type.i;
+				
+				/* create a new obj for r and push */
+				push(o, s);
+			}
+			if (strcmp(token, "/") == 0) {
+				obj *a = pop(s);
+				obj *b = pop(s);
+
+			}
+			if (strcmp(token, "-") == 0) {
+				obj *a = pop(s);
+				obj *b = pop(s);
+
+			}
+			if (strcmp(token, "+") == 0) {
+				obj *a = pop(s);
+				obj *b = pop(s);
+			}
+			/* print the value at the top of the stack */
+			if (strcmp(token, ".") == 0) {
+				obj *o = pop(s);
+				if (o->obj_type == INT_TYPE) {
+					printf("%d\n", o->type.i);
+				}
+				else if (o->obj_type == STR_TYPE) {
+					printf("%s\n", o->type.str.s);
+				}
+
 			}
 		}
 		token = strtok(NULL, " \n\t");
 	}
 }
+
+void interactive_mode(char *buf, stack *s){
+
+	/*TODO:
+	 * handle CTRL + D it causes infinite loop */
+	while(1) {
+		printf(">>> ");
+		fgets(buf, MAX, stdin);
+		parse(buf, s);
+		if (strcmp(buf, "exit") == 0)
+			exit(1);
+	}
+
+}
+
 int main(int argc, char **argv) {
 
+	char buf[MAX];
+	stack s;
+	s.top = 0;
+
+	if (argc == 1) {
+		interactive_mode(buf, &s);
+	}
 	if (argc != 2) {
 		fprintf(stderr, "Usage: <filename>\n");
 		return 1;
@@ -104,9 +153,7 @@ int main(int argc, char **argv) {
 		perror("open");
 		return 1;
 	}
-	char buf[MAX];
-	stack s;
-	s.top = 0;
+
 	while(fgets(buf, sizeof(buf), fp) != NULL) {
 		printf("%s", buf);
 		parse(buf, &s);
